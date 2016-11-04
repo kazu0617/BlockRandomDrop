@@ -1,0 +1,20 @@
+main: net.kazu0617.blockrandomdrop.Main
+name: BlockRandomDrop
+author: [kazu0617]
+version: 0.2.2
+
+commands:
+  blockrandomdrop:
+    description: use Plugin Command
+    aliases: [brd,blockrd]
+
+permissions:
+  blockrandomdrop.use:
+    description: to Use Ticket
+    default: true
+  blockrandomdrop.help:
+    description: to Open Plugin usage
+    default: true
+  blockrandomdrop.debug:
+    description: toggle DebugMode
+    default: op
