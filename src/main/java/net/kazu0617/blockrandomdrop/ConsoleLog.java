@@ -1,6 +1,6 @@
-/*
+/**
  * @author     kazu0617
- * @license    LGPLv3
+ * @license    MIT
  * @copyright  Copyright kazu0617 2015
  */
 package net.kazu0617.blockrandomdrop;

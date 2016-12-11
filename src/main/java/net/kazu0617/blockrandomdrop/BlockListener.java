@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.kazu0617.blockrandomdrop;
 
 import java.io.IOException;
@@ -15,8 +10,9 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 /**
- *
- * @author kazu0617<kazuyagi19990617@hotmail.co.jp>
+ * @author     kazu0617
+ * @license    MIT
+ * @copyright  Copyright kazu0617 2015
  */
 class BlockListener implements Listener {
     Main plugin;
