@@ -3,6 +3,9 @@ package net.kazu0617.blockrandomdrop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -67,55 +70,41 @@ class FileIO {
         return "err";
     }*/
 
-    public boolean BreakStoneIO(String Mode, String pname, String Block, int Item_times) throws IOException {
-        File file = new File(plugin.folder + "playerdata" + File.separator + pname + File.separator + "BreakStone.yml");
+    public HashMap ItemIO(String Mode, HashMap<String,Object> SaveDropItem) throws IOException {
+        File file = new File(plugin.folder + "DropItem.yml");
         FileConfiguration yaml = new YamlConfiguration();
-        int BStone;
-        /*class Item{
-            String ItemName = "";
-            double ItemPersent = 0;
-            int ItemTimes = 0;
-            int BreakItem = 0;
-            int BreakMinHeight = 20;
-        }*/
-        //Item[] BreakBlock = new Item[20];
-        //for(int Num = 0; Num < BreakBlock.length; Num++ ){
-        //    BreakBlock[Num] = new Item();
-        //}
-        //String[] Item_S = {"Coal","Iron","RedStone","Gold","Emerald","Lapis","Diamond"};
-        //int[] Item_persent = {50,70,75,90,100,150,200};//100を指定した場合は、0~999の間で読まれる…？(元々が0.12426454…という感じなので124.26454…と言った感じに)
-        //int[] Item_times = {3,5,5,10,10,15,15,20};
-        //int[] Item_CanBreak = {0,1,2,2,1,1,2};
-        //int[] BlockHeight = {20,20,20,20,20,20,20};
+
         try {
             yaml.load(file);
         } catch (FileNotFoundException | InvalidConfigurationException ex) {
             plugin.cLog.info("該当するプレイヤーファイルがありませんでした。新規作成します");
             SettingFiles(yaml, file, true);
         }
-        if("s".equalsIgnoreCase(Mode))
-        {
-            if("all".equalsIgnoreCase(Block)){
-                return false;
+        if("s".equalsIgnoreCase(Mode)) {
+            Set<String> DropItemConfigName = SaveDropItem.keySet();
+            for(String str : DropItemConfigName) {
+                ConfigurationSection yamltmp = yaml.getConfigurationSection(str);
+                for(String str2 : ((Set<String>) SaveDropItem.get(str))) {
+                    HashMap<String, Object> SaveDropItemConfig = new HashMap<>();
+                    yaml.set( str+ "."+ str2,( (Set<String>) ( (Set<String>) SaveDropItem.get(str) ).get(str2) ));
+                }
             }
-            BStone = yaml.getInt(Block);
-            BStone++;
-            yaml.set(Block, BStone );
-            if(plugin.DebugMode) plugin.cLog.debug("Save.BStone = " + BStone );
             SettingFiles(yaml, file, true);
-            return true;
         }
-        else if("r".equalsIgnoreCase(Mode))
-        {
-            BStone = yaml.getInt(Block);
-            if(plugin.DebugMode) plugin.cLog.debug("Load.BStone = " + BStone);
-            int tmp = 1;
-            if("Diamond".equals(Block)) tmp = 5;
-            if("Coal".equals(Block)) tmp = 1;
-            return BStone % tmp == 0 && BStone != 0;
+        else if("r".equalsIgnoreCase(Mode)) {
+            HashMap<String, HashMap> DropItemList = new HashMap<>();
+            Set<String> DropItemConfigName = yaml.getKeys(false);
+            for (String str : DropItemConfigName) {
+                ConfigurationSection yamltmp = yaml.getConfigurationSection(str);
+                HashMap<String, Object> tmpItem = new HashMap<>();
+                tmpItem.putAll(yamltmp.getValues(true));
+                DropItemList.put(str, tmpItem);
+            }
+            return DropItemList;
         }
-        return true;
-    }    public boolean PersentIO(String Mode) throws IOException {
+        return null;
+    }
+    public boolean PersentIO(String Mode) throws IOException {
         File file = new File(plugin.folder + "blockdata.yml");
         FileConfiguration yaml = new YamlConfiguration();
         try {
@@ -129,8 +118,6 @@ class FileIO {
         {
             for(int i = 0 ; i < plugin.BreakListener.Item_S.length ; i++){
                 yaml.set(plugin.BreakListener.Item_S[i]+".Item_persent", plugin.BreakListener.Item_persent[i] );
-                yaml.set(plugin.BreakListener.Item_S[i]+".Item_times", plugin.BreakListener.Item_times[i] );
-                yaml.set(plugin.BreakListener.Item_S[i]+".Item_CanBreak", plugin.BreakListener.Item_CanBreak[i] );
                 //yaml.set(plugin.BreakListener.Item_S[i]+".BlockHeight", plugin.BreakListener.BlockHeight[i] );
             }
             SettingFiles(yaml, file, true);
@@ -140,7 +127,7 @@ class FileIO {
         else if("r".equalsIgnoreCase(Mode))
         {
             for(int i = 0 ; i < plugin.BreakListener.Item_S.length ; i++){
-                plugin.BreakListener.Item[i] = (ItemStack) yaml.get(plugin.BreakListener.Item_S[i]+".Item_persent");
+                plugin.BreakListener.Item_old[i] = (ItemStack) yaml.get(plugin.BreakListener.Item_S[i]+".Item_persent");
                 plugin.BreakListener.Item_persent[i] = (int) yaml.get(plugin.BreakListener.Item_S[i]+".Item_times");
                 plugin.BreakListener.Item_CanBreak[i] = (int) yaml.get(plugin.BreakListener.Item_S[i]+".Item_CanBreak");
                 //plugin.BreakListener.BlockHeight[i] = (int) yaml.get(plugin.BreakListener.Item_S[i]+".BlockHeight");
